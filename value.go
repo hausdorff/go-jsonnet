@@ -46,7 +46,7 @@ type potentialValue interface {
 }
 
 // A set of variables with associated potentialValues.
-type bindingFrame map[identifier]potentialValue
+type bindingFrame map[Identifier]potentialValue
 
 type valueBase struct{}
 
@@ -148,14 +148,14 @@ type valueFunction struct {
 // TODO(sbarzowski) better name?
 type evalCallable interface {
 	EvalCall(args callArguments, e *evaluator) (value, error)
-	Parameters() identifiers
+	Parameters() Identifiers
 }
 
 func (f *valueFunction) call(args callArguments) potentialValue {
 	return makeCallThunk(f.ec, args)
 }
 
-func (f *valueFunction) parameters() identifiers {
+func (f *valueFunction) parameters() Identifiers {
 	return f.ec.Parameters()
 }
 
@@ -226,7 +226,7 @@ type valueSimpleObject struct {
 	valueObjectBase
 	upValues bindingFrame
 	fields   valueSimpleObjectFieldMap
-	asserts  []astNode
+	asserts  []Node
 }
 
 func (o *valueSimpleObject) index(e *evaluator, field string) (value, error) {
@@ -237,7 +237,7 @@ func (*valueSimpleObject) inheritanceSize() int {
 	return 1
 }
 
-func makeValueSimpleObject(b bindingFrame, fields valueSimpleObjectFieldMap, asserts astNodes) *valueSimpleObject {
+func makeValueSimpleObject(b bindingFrame, fields valueSimpleObjectFieldMap, asserts Nodes) *valueSimpleObject {
 	return &valueSimpleObject{
 		upValues: b,
 		fields:   fields,
@@ -250,7 +250,7 @@ type valueSimpleObjectFieldMap map[string]valueSimpleObjectField
 // TODO(sbarzowski) this is not a value and the name suggests it is...
 // TODO(sbarzowski) better name? This is basically just a (hide, field) pair.
 type valueSimpleObjectField struct {
-	hide  astObjectFieldHide
+	hide  ObjectFieldHide
 	field unboundField
 }
 
@@ -343,7 +343,7 @@ func objectIndex(e *evaluator, sb selfBinding, fieldName string) (value, error) 
 	return e.evaluate(field.field.bindToObject(fieldSelfBinding, upValues))
 }
 
-type fieldHideMap map[string]astObjectFieldHide
+type fieldHideMap map[string]ObjectFieldHide
 
 func objectFieldsVisibility(obj valueObject) fieldHideMap {
 	r := make(fieldHideMap)
@@ -367,7 +367,7 @@ func objectFieldsVisibility(obj valueObject) fieldHideMap {
 func objectFields(obj valueObject, manifesting bool) []string {
 	var r []string
 	for fieldName, hide := range objectFieldsVisibility(obj) {
-		if !manifesting || hide != astObjectFieldHidden {
+		if !manifesting || hide != ObjectFieldHidden {
 			r = append(r, fieldName)
 		}
 	}
