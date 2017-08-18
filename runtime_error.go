@@ -16,6 +16,8 @@ limitations under the License.
 
 package jsonnet
 
+import "github.com/google/go-jsonnet/ast"
+
 // RuntimeError is an error discovered during evaluation of the program
 type RuntimeError struct {
 	StackTrace []TraceFrame
@@ -39,7 +41,7 @@ func (err RuntimeError) Error() string {
 // TraceFrame is tracing information about a single frame of the call stack.
 // TODO(sbarzowski) the difference from TraceElement. Do we even need this?
 type TraceFrame struct {
-	Loc  LocationRange
+	Loc  ast.LocationRange
 	Name string
 }
 
@@ -55,8 +57,8 @@ func traceElementToTraceFrame(trace *TraceElement) TraceFrame {
 }
 
 type TraceContext struct {
-	// Location of creation/definition.
-	Loc *LocationRange
+	// ast.Location of creation/definition.
+	Loc *ast.LocationRange
 
 	// Human readable name - e.g. function <foo>
 	Name string
@@ -64,6 +66,6 @@ type TraceContext struct {
 
 // TODO(sbarzowski) better name
 type TraceElement struct {
-	loc     *LocationRange
+	loc     *ast.LocationRange
 	context *TraceContext
 }

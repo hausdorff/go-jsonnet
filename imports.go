@@ -83,7 +83,7 @@ func (cache *ImportCache) ImportCode(codeDir, importedPath string, e *evaluator)
 		return nil, data.err
 	}
 	if data.asCode == nil {
-		ast, err := snippetToAST(data.data.foundHere, data.data.content)
+		node, err := snippetToAST(data.data.foundHere, data.data.content)
 		if err != nil {
 			// TODO(sbarzowski) perhaps we should wrap (static) error here
 			// within a RuntimeError? Because whether we get this error or not
@@ -100,7 +100,7 @@ func (cache *ImportCache) ImportCode(codeDir, importedPath string, e *evaluator)
 			// The same thinking applies to external variables.
 			data.asCode = makeErrorThunk(err)
 		} else {
-			data.asCode = makeThunk("import", e.i.initialEnv, ast)
+			data.asCode = makeThunk("import", e.i.initialEnv, node)
 		}
 	}
 	return e.evaluate(data.asCode)

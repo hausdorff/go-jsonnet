@@ -16,6 +16,8 @@ limitations under the License.
 
 package jsonnet
 
+import "github.com/google/go-jsonnet/ast"
+
 // readyValue
 // -------------------------------------
 
@@ -41,12 +43,12 @@ func (rv *readyValue) bindToObject(sb selfBinding, origBinding bindingFrame) pot
 
 // thunk holds code and environment in which the code is supposed to be evaluated
 type thunk struct {
-	name Identifier
+	name ast.Identifier
 	env  environment
-	body Node
+	body ast.Node
 }
 
-func makeThunk(name Identifier, env environment, body Node) *cachedThunk {
+func makeThunk(name ast.Identifier, env environment, body ast.Node) *cachedThunk {
 	return makeCachedThunk(&thunk{
 		name: name,
 		env:  env,
@@ -122,7 +124,7 @@ func makeErrorThunk(err error) *errorThunk {
 // -------------------------------------
 
 type codeUnboundField struct {
-	body Node
+	body ast.Node
 }
 
 func (f *codeUnboundField) bindToObject(sb selfBinding, origBinding bindingFrame) potentialValue {
@@ -137,7 +139,7 @@ type closure struct {
 	// base environment of a closure
 	// arguments should be added to it, before executing it
 	env      environment
-	function *Function
+	function *ast.Function
 }
 
 func (closure *closure) EvalCall(arguments callArguments, e *evaluator) (value, error) {
@@ -157,11 +159,11 @@ func (closure *closure) EvalCall(arguments callArguments, e *evaluator) (value, 
 	return e.evalInCleanEnv(&context, &calledEnvironment, closure.function.Body)
 }
 
-func (closure *closure) Parameters() Identifiers {
+func (closure *closure) Parameters() ast.Identifiers {
 	return closure.function.Parameters
 }
 
-func makeClosure(env environment, function *Function) *closure {
+func makeClosure(env environment, function *ast.Function) *closure {
 	return &closure{
 		env:      env,
 		function: function,
